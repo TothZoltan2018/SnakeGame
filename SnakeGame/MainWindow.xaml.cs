@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SnakeGame.Model;
 
 namespace SnakeGame
 {
@@ -20,9 +21,17 @@ namespace SnakeGame
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Arena arena;
+
         public MainWindow()
         {
             InitializeComponent();
+            arena = new Arena();
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            arena.KeyDown(e);
         }
     }
 }
