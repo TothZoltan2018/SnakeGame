@@ -14,6 +14,7 @@ namespace SnakeGame.Model
     class Arena
     {
         private MainWindow View;
+        private Snake snake;
 
         public Arena(MainWindow view)
         {
@@ -21,6 +22,9 @@ namespace SnakeGame.Model
 
             //A jatekszabalyok megjelenitese
             View.GamePlayTextBlock.Visibility = System.Windows.Visibility.Visible;
+
+            snake = new Snake(10, 10);
+
 
             //A kigyofej megjelenitese
             //A grid-ben az elemek sorban vannak, mint egy listaban. Itt a 10. sor 10. elemet indexeljuk (0-tol)
