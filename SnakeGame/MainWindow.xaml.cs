@@ -26,9 +26,11 @@ namespace SnakeGame
         public MainWindow()
         {
             InitializeComponent();
-            arena = new Arena();
+            //Amikor letrehozzuk a jatekmenetet, atadjuk parameterben a kepernyot
+            //A this kulcsszoval adjuk at a MainWindow osztaly jelen peldanyat.
+            arena = new Arena(this);
         }
-
+        //Az XAML-ben: KeyDown="Window_KeyDown"
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             arena.KeyDown(e);
