@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using SnakeGame;
+
 
 namespace SnakeGame.Model
 {
@@ -17,8 +19,9 @@ namespace SnakeGame.Model
     {
         private MainWindow View;
         private Snake snake;
-        private DispatcherTimer pendulum;
+        private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
+        private TimeSpan playTime = TimeSpan.FromSeconds(120); //Todo Attenni a konstruktorba
 
         public Arena(MainWindow view)
         {
@@ -29,12 +32,26 @@ namespace SnakeGame.Model
 
             snake = new Snake(10, 10);
 
-            pendulum = new DispatcherTimer(TimeSpan.FromMilliseconds(100), DispatcherPriority.Normal,
+            pendulum = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal,
                         ItsTimeForDisplay, Application.Current.Dispatcher);
 
             isStarted = false;
 
+            pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
+            pendulumClock.Stop();
        }
+
+        private void Clockshock(object sender, EventArgs e)
+        {
+            playTime -= TimeSpan.FromSeconds(1);
+            if (playTime == TimeSpan.FromSeconds(0))
+            {
+                //Todo Vege a jateknak
+                
+            }
+            
+            View.LabelPlaytime.Content = $"{playTime.Minutes:00}:{playTime.Seconds:00}";
+        }
 
         private void ItsTimeForDisplay(object sender, EventArgs e)
         {
@@ -117,8 +134,7 @@ namespace SnakeGame.Model
                     //Console.WriteLine($"A lenyomott bill: {e.Key}"); //Ez nekem nem mukodott...
                     Debug.WriteLine($"A lenyomott bill: {e.Key}");
                     break;
-            }
-            
+            }            
         }
 
         private void StartNewGame()
@@ -128,6 +144,7 @@ namespace SnakeGame.Model
             View.NumberOfMealsTextBlock.Visibility = System.Windows.Visibility.Visible;
             View.ArenaGrid.Visibility = System.Windows.Visibility.Visible;
             isStarted = true;
+            pendulumClock.Start();
         }
     }
 }

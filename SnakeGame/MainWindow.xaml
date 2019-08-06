@@ -17,7 +17,8 @@
                    Foreground="LightGray"
                    Text="0"
                    Visibility="Hidden"/>
-        
+        <Label x:Name="LabelPlaytime"/>
+
         <!--A jatek negyzethalojat a megevett etelek szama utan irtuk meg,
         igy az "foleje kerul".-->
         <Grid x:Name="ArenaGrid" Opacity="0.23">
