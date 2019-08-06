@@ -34,6 +34,7 @@ namespace SnakeGame.Model
                 case Key.Down:
                     //Eltuntetjuk a jatekszabalyokat
                     View.GamePlayTextBlock.Visibility = System.Windows.Visibility.Hidden;
+                    View.NumberOfMealsTextBlock.Visibility = System.Windows.Visibility.Visible;
                     //Console.WriteLine($"A lenyomott bill: {e.Key}"); //Ez nekem nem mukodott...
                     Debug.WriteLine($"A lenyomott bill: {e.Key}");
                     break;
