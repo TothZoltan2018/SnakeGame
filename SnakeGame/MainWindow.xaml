@@ -21,7 +21,7 @@
 
         <!--A jatek negyzethalojat a megevett etelek szama utan irtuk meg,
         igy az "foleje kerul".-->
-        <Grid x:Name="ArenaGrid" Opacity="0.23">
+        <Grid x:Name="ArenaGrid" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>

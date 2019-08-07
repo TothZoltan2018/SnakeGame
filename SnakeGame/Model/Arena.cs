@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using SnakeGame;
 
@@ -89,22 +90,57 @@ namespace SnakeGame.Model
 
             ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
-            ////A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
-            //cell = View.ArenaGrid.Children[neck.RowPosition * 20 + neck.ColumnPosition];
-            //image = (FontAwesome.WPF.ImageAwesome)cell;
-            //image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
+            //A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
+            ShowSnakeNeck(neck.RowPosition, neck.ColumnPosition);
+            //Viszont, a farok adataihoz a nyaknak hozza kell adodnia
+            snake.Tail.Add(new ArenaPosition(neck.RowPosition, neck.ColumnPosition));
+
+            //Amig a kigyo hossza kisebb, mint aminek lennie kellene
+            if (snake.Tail.Count < snake.Length)
+            {//addig nem csinalunk semmit, hadd "novekedjen"
+
+            }
+            else
+            {//Mar megvan a teljes hossz, ne legyen hosszabb; a kigyo legveget torolni kell, ami az elso elem a listaban
+                //Meg torles elott kell az info, hogy melyik ArenaPozicioban van, hogy oda visszarakjuk az eredeti racsot
+                var end = snake.Tail[0];
+                ShowEmptyArenaPosition(end.RowPosition, end.ColumnPosition);
+                //majd az adatk kozul is toroljuk 
+                snake.Tail.RemoveAt(0);
+            }
+        }
+
+        private void ShowEmptyArenaPosition(int rowPosition, int columnPosition)
+        {
+            var image = GetImage(rowPosition, columnPosition);
+            image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
+            image.Foreground = Brushes.Black;
+
+        }
+
+        private void ShowSnakeNeck(int rowPosition, int columnPosition)
+        {
+            var image = GetImage(rowPosition, columnPosition);
+            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+            image.Foreground = Brushes.Gray;
         }
 
         private void ShowSnakeHead(int rowPosition, int columnPosition)
         {
-            //Ki kell rajzolni a kovetkezo poziciora a kigyo fejet
-            //A kigyofej megjelenitese
+            //Ki kell rajzolni a kovetkezo poziciora a kigyo fejet            
+            var image = GetImage(rowPosition, columnPosition);
+            //ennek mar el lehet kerni az ikon tulajdonsagat
+            //A kigyofej megjelenitese Circle ikonnal
+            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+        }
+
+        private FontAwesome.WPF.ImageAwesome GetImage(int rowPosition, int columnPosition)
+        {
             //A grid-ben az elemek sorban vannak, mint egy listaban. Ez a gyujtemeny a Children.
             //Viszont ez egy altalanos, UIElement tipusu elem lesz, nem ikon
             var cell = View.ArenaGrid.Children[rowPosition * 20 + columnPosition];
             var image = (FontAwesome.WPF.ImageAwesome)cell;
-            //ennek mar el lehet kerni az ikon tulajdonsagat
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+            return image;
         }
 
         internal void KeyDown(KeyEventArgs e)

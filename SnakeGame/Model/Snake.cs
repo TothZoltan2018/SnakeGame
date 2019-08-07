@@ -15,6 +15,11 @@ namespace SnakeGame.Model
         {
             HeadPosition = new ArenaPosition(rowPosition, columnPosition);
             Heading = SnakeHeadingEnum.InPlace;
+            Length = 4;
+            //gondoskodom arrol, hogy a lista valtozom listat tartalmazzon, nehogy 
+            //object reference null kivetel tortenjen
+            //https://netacademia.blog.hu/2017/05/30/miert_ne_hasznaljunk_null-t
+            Tail = new List<ArenaPosition>();
         }
 
         //Tudnia kell, hogy hol van a feje
@@ -28,6 +33,9 @@ namespace SnakeGame.Model
         /// Ehhez nyilvan kell tartanunk a kigyo farkanak pontjait egy listaban
         /// </summary>
         public List<ArenaPosition> Tail { get; set; }
+
+        public int Length { get; set; }
+        
 
         //Ket property: a kigyo farok vege es a nyaka, ami az eleje.
 
