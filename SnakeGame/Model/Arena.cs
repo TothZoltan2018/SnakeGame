@@ -64,7 +64,7 @@ namespace SnakeGame.Model
             //var currentPosition = snake.HeadPosition;
 
             //Igy mar helyesen mukodik a regi ertek mentese egy uj peldanyba
-            var currentPosition = new ArenaPosition(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+            var neck = new ArenaPosition(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
             //Ki kell szamolni a kovetkezo poziciot a fej iranya alapjan
             switch (snake.Heading)
@@ -86,19 +86,25 @@ namespace SnakeGame.Model
                 default:
                     break;
             }
+
+            ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+
+            ////A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
+            //cell = View.ArenaGrid.Children[neck.RowPosition * 20 + neck.ColumnPosition];
+            //image = (FontAwesome.WPF.ImageAwesome)cell;
+            //image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
+        }
+
+        private void ShowSnakeHead(int rowPosition, int columnPosition)
+        {
             //Ki kell rajzolni a kovetkezo poziciora a kigyo fejet
             //A kigyofej megjelenitese
             //A grid-ben az elemek sorban vannak, mint egy listaban. Ez a gyujtemeny a Children.
             //Viszont ez egy altalanos, UIElement tipusu elem lesz, nem ikon
-            var cell = View.ArenaGrid.Children[snake.HeadPosition.RowPosition * 20 + snake.HeadPosition.ColumnPosition];
+            var cell = View.ArenaGrid.Children[rowPosition * 20 + columnPosition];
             var image = (FontAwesome.WPF.ImageAwesome)cell;
             //ennek mar el lehet kerni az ikon tulajdonsagat
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
-                        
-            //El kell tuntetni a korabbi poziciorol
-            cell = View.ArenaGrid.Children[currentPosition.RowPosition * 20 + currentPosition.ColumnPosition];
-            image = (FontAwesome.WPF.ImageAwesome)cell;
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
         }
 
         internal void KeyDown(KeyEventArgs e)

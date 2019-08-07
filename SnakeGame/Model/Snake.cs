@@ -24,5 +24,13 @@ namespace SnakeGame.Model
         public SnakeHeadingEnum Heading { get; set; }
 
         //Tudnia kell, hogy milyen hosszu
+        /// <summary>
+        /// Ehhez nyilvan kell tartanunk a kigyo farkanak pontjait egy listaban
+        /// </summary>
+        public List<ArenaPosition> Tail { get; set; }
+
+        //Ket property: a kigyo farok vege es a nyaka, ami az eleje.
+
+
     }
 }
