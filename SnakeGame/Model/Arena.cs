@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -104,7 +105,33 @@ namespace SnakeGame.Model
                 //Mivel vege a jateknak, nem csinalunk mar semmit
                 return;
             }
-                //Az uj pozicio etel-e?
+
+            //Sajat farkunkba haraptunk -e?
+
+            //old school
+                    //var collision = false;
+                    //foreach (var tailitem in snake.Tail)
+                    //{//Vegigmengyunk a farokpontokon, ellenorizzuk, hogy az uj fej poz, egyezik -e?
+                    //    if (tailitem.RowPosition == snake.HeadPosition.RowPosition && tailitem.ColumnPosition == snake.HeadPosition.ColumnPosition)
+                    //    {
+                    //        collision = true;
+                    //    }
+                    //}
+                    //if (collision)
+                    //{//utkoztunk
+                    //    EndOfGame();
+                    //}
+
+            //LINQ megoldas
+            if (snake.Tail.Any(x => x.RowPosition == snake.HeadPosition.RowPosition
+                                 && x.ColumnPosition == snake.HeadPosition.ColumnPosition))
+            {//utkoztunk
+                EndOfGame();
+                return;
+            }
+
+            
+            //Az uj pozicio etel-e?
 
 
 
