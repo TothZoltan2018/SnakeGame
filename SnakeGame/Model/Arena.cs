@@ -19,10 +19,14 @@ namespace SnakeGame.Model
         private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
         private TimeSpan playTime;
+        //A tabla meretei
         private int RowCount;
         private int ColumnCount;
         private Random Random; //A tipus nevet is hasznalhatom valtozonevkent
+        //Az etelek nyilvantartasa
         private Foods foods;
+        //a megevett etelek szama
+        private int foodsHaveEatenCount;
 
         public Arena(MainWindow view)
         {
@@ -50,6 +54,9 @@ namespace SnakeGame.Model
             Random = new Random();
 
             foods = new Foods();
+
+            foodsHaveEatenCount = 0;
+
         }
 
         private void Clockshock(object sender, EventArgs e)
@@ -134,9 +141,25 @@ namespace SnakeGame.Model
                 return;
             }
 
-            
-            //Az uj pozicio etel-e?
+            //ellenorini, hogy ettunk -e? Kigyo feje vs etelek listaja
+            //Todo: helyezzuk at ezt az ellenorzest a Remove fgv-be, es adja vissza, hogy 
+            //true: letezett es torolte, false: nem letezik
+            if (foods.FoodPositions.Any(x => x.RowPosition == snake.HeadPosition.RowPosition
+                                        && x.ColumnPosition == snake.HeadPosition.ColumnPosition))
+            {//ettunk: a kigyo feje el fogja tuntetni az etelt, 
+                //igy csak adminisztralnunk 
+                //toroljuk az etelt az etelek kozul
+                foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
+                foodsHaveEatenCount++;
+                
+                //megjelenitjuk, hogy mennyit ettunk
+                View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
+
+                //generalunk egy uj etelt
+                GetNewFood();
+
+            }
 
 
 
@@ -176,7 +199,6 @@ namespace SnakeGame.Model
             var image = GetImage(rowPosition, columnPosition);
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
             image.Foreground = Brushes.Black;
-
         }
 
         private void ShowSnakeNeck(int rowPosition, int columnPosition)
@@ -258,7 +280,15 @@ namespace SnakeGame.Model
             //A jatekido visszaszamlalo inditasa
             pendulumClock.Start();
 
+            GetNewFood();
 
+        }
+        /// <summary>
+        /// A fgv feladata, hogy generaljon egy uj etelt, olyat, ami nem a kigyo fejenek vagy farkanak helyen van,
+        /// es jelenitse is meg.
+        /// </summary>
+        private void GetNewFood()
+        {
             //A kigyora nem rakhatjuk, ezert addig generalunk uj etelt, amig vegul nem esik ra
             int row;
             int col;
@@ -282,11 +312,6 @@ namespace SnakeGame.Model
 
             //megjelenitjuk az uj etelt
             ShowNewFood(row, col);
- 
-            
-   
-
         }
-
     }
 }
