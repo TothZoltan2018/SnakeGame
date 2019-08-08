@@ -21,6 +21,8 @@ namespace SnakeGame.Model
         private TimeSpan playTime;
         private int RowCount;
         private int ColumnCount;
+        private Random Random; //A tipus nevet is hasznalhatom valtozonevkent
+        private Foods foods;
 
         public Arena(MainWindow view)
         {
@@ -45,7 +47,9 @@ namespace SnakeGame.Model
             RowCount = 20;
             ColumnCount = 20;
 
+            Random = new Random();
 
+            foods = new Foods();
         }
 
         private void Clockshock(object sender, EventArgs e)
@@ -166,6 +170,7 @@ namespace SnakeGame.Model
             //Todo: lehetoseget adni az ujrajatszasra
         }
 
+        //todo: ebbol a 4 fgv-bol el lehetne tuntetni a duplikaciot
         private void ShowEmptyArenaPosition(int rowPosition, int columnPosition)
         {
             var image = GetImage(rowPosition, columnPosition);
@@ -188,6 +193,13 @@ namespace SnakeGame.Model
             //ennek mar el lehet kerni az ikon tulajdonsagat
             //A kigyofej megjelenitese Circle ikonnal
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+        }
+
+        private void ShowNewFood(int rowPosition, int columnPosition)
+        {
+            var image = GetImage(rowPosition, columnPosition);
+            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
+            image.Foreground = Brushes.Red;
         }
 
         private FontAwesome.WPF.ImageAwesome GetImage(int rowPosition, int columnPosition)
@@ -242,7 +254,39 @@ namespace SnakeGame.Model
             View.NumberOfMealsTextBlock.Visibility = System.Windows.Visibility.Visible;
             View.ArenaGrid.Visibility = System.Windows.Visibility.Visible;
             isStarted = true;
+
+            //A jatekido visszaszamlalo inditasa
             pendulumClock.Start();
+
+
+            //A kigyora nem rakhatjuk, ezert addig generalunk uj etelt, amig vegul nem esik ra
+            int row;
+            int col;
+            do
+            {
+                //Etel kiosztasa
+                //Veletlenszeruen
+                row = Random.Next(0, RowCount - 1);
+                col = Random.Next(0, ColumnCount - 1);
+
+            } while (snake.HeadPosition.RowPosition == row && snake.HeadPosition.ColumnPosition == col
+                                                || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col));
+            //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
+
+            //adminisztraljuk az adatokat
+
+            //ezzel is jo, de...
+            //foods.FoodPositions.Add(new ArenaPosition(row, col));
+            //Ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
+            foods.Add(row, col);
+
+            //megjelenitjuk az uj etelt
+            ShowNewFood(row, col);
+ 
+            
+   
+
         }
+
     }
 }
