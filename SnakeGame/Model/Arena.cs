@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using SnakeGame;
 
 
 namespace SnakeGame.Model
@@ -22,7 +17,9 @@ namespace SnakeGame.Model
         private Snake snake;
         private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
-        private TimeSpan playTime = TimeSpan.FromSeconds(120); //Todo Attenni a konstruktorba
+        private TimeSpan playTime;
+        private int RowCount;
+        private int ColumnCount;
 
         public Arena(MainWindow view)
         {
@@ -38,9 +35,17 @@ namespace SnakeGame.Model
 
             isStarted = false;
 
+            playTime = TimeSpan.FromSeconds(120);
             pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
             pendulumClock.Stop();
-       }
+
+            //az arena mereteinek beallitasa
+            //todo: az arena meretezeset atvenni a Window Gridbol (ArenaGrid), nem pedig bedrotozni a meretet.
+            RowCount = 20;
+            ColumnCount = 20;
+
+
+        }
 
         private void Clockshock(object sender, EventArgs e)
         {
@@ -48,9 +53,9 @@ namespace SnakeGame.Model
             if (playTime == TimeSpan.FromSeconds(0))
             {
                 //Todo Vege a jateknak
-                
+
             }
-            
+
             View.LabelPlaytime.Content = $"{playTime.Minutes:00}:{playTime.Seconds:00}";
         }
 
@@ -88,6 +93,22 @@ namespace SnakeGame.Model
                     break;
             }
 
+            //Megvan a fej uj pozicioja. Meg a megjelenites elott ellenorizni kell, hogy:
+            //falnak mentunk-e?
+            if (snake.HeadPosition.RowPosition < 0 ||
+                snake.HeadPosition.RowPosition > RowCount - 1 ||
+                snake.HeadPosition.ColumnPosition < 0 ||
+                snake.HeadPosition.ColumnPosition > ColumnCount - 1)
+            {//Jatek vege                
+                EndOfGame();
+                //Mivel vege a jateknak, nem csinalunk mar semmit
+                return;
+            }
+                //Az uj pozicio etel-e?
+
+
+
+
             ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
             //A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
@@ -108,6 +129,14 @@ namespace SnakeGame.Model
                 //majd az adatk kozul is toroljuk 
                 snake.Tail.RemoveAt(0);
             }
+        }
+
+        private void EndOfGame()
+        {            
+            pendulum.Stop();
+            pendulumClock.Stop();
+            //Todo: ki kell irni, hogy vege van           
+            //Todo: lehetoseget adni az ujrajatszasra
         }
 
         private void ShowEmptyArenaPosition(int rowPosition, int columnPosition)
@@ -138,7 +167,7 @@ namespace SnakeGame.Model
         {
             //A grid-ben az elemek sorban vannak, mint egy listaban. Ez a gyujtemeny a Children.
             //Viszont ez egy altalanos, UIElement tipusu elem lesz, nem ikon
-            var cell = View.ArenaGrid.Children[rowPosition * 20 + columnPosition];
+            var cell = View.ArenaGrid.Children[rowPosition * RowCount + columnPosition];
             var image = (FontAwesome.WPF.ImageAwesome)cell;
             return image;
         }
