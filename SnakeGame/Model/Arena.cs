@@ -37,8 +37,7 @@ namespace SnakeGame.Model
 
             snake = new Snake(10, 10);
 
-            pendulum = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal,
-                        ItsTimeForDisplay, Application.Current.Dispatcher);
+            StartPendulum();
 
             isStarted = false;
 
@@ -56,7 +55,20 @@ namespace SnakeGame.Model
             foods = new Foods();
 
             foodsHaveEatenCount = 0;
+        }
 
+        private void StartPendulum()
+        {
+            //ha fut az ingaoram, akkor megallitjuk
+            if (pendulum != null && pendulum.IsEnabled)
+            {
+                pendulum.Stop();
+            }
+
+            //ujrainditjuk, vagy elinditjuk a kigyo hosszanak megfeleloen
+            var interval = 2000 / snake.Length;
+            pendulum = new DispatcherTimer(TimeSpan.FromMilliseconds(interval), DispatcherPriority.Normal,
+                        ItsTimeForDisplay, Application.Current.Dispatcher);
         }
 
         private void Clockshock(object sender, EventArgs e)
@@ -152,13 +164,18 @@ namespace SnakeGame.Model
                 foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
                 foodsHaveEatenCount++;
-                
+
+                //egyek nojon a kigyo hpssza
+                snake.Length++;
+
+                //es gyorsuljon is
+
+
                 //megjelenitjuk, hogy mennyit ettunk
                 View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
 
-                //generalunk egy uj etelt
-                GetNewFood();
-
+                //generalunk uj eteleket
+                GetNewFood(2);
             }
 
 
@@ -280,38 +297,47 @@ namespace SnakeGame.Model
             //A jatekido visszaszamlalo inditasa
             pendulumClock.Start();
 
-            GetNewFood();
+            GetNewFood(1);
 
         }
         /// <summary>
         /// A fgv feladata, hogy generaljon egy uj etelt, olyat, ami nem a kigyo fejenek vagy farkanak helyen van,
         /// es jelenitse is meg.
         /// </summary>
-        private void GetNewFood()
+        private void GetNewFood(int foodNum)
         {
             //A kigyora nem rakhatjuk, ezert addig generalunk uj etelt, amig vegul nem esik ra
             int row;
             int col;
-            do
+
+            var rnd = new Random();
+            foodNum = rnd.Next(1, foodNum+1);
+            
+            for (int i = 0; i < foodNum; i++)
             {
-                //Etel kiosztasa
-                //Veletlenszeruen
-                row = Random.Next(0, RowCount - 1);
-                col = Random.Next(0, ColumnCount - 1);
+                do
+                {
+                    //Etel kiosztasa
+                    //Veletlenszeruen
+                    row = Random.Next(0, RowCount - 1);
+                    col = Random.Next(0, ColumnCount - 1);
 
-            } while (snake.HeadPosition.RowPosition == row && snake.HeadPosition.ColumnPosition == col
-                                                || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col));
-            //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
+                } while (snake.HeadPosition.RowPosition == row && snake.HeadPosition.ColumnPosition == col
+                                        || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col)
+                                        || foods.FoodPositions.Any(x => x.RowPosition == row && x.ColumnPosition == col)
+                                        );
+                //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
 
-            //adminisztraljuk az adatokat
+                //adminisztraljuk az adatokat
 
-            //ezzel is jo, de...
-            //foods.FoodPositions.Add(new ArenaPosition(row, col));
-            //Ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
-            foods.Add(row, col);
+                //ezzel is jo, de...
+                //foods.FoodPositions.Add(new ArenaPosition(row, col));
+                //Ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
+                foods.Add(row, col);
 
-            //megjelenitjuk az uj etelt
-            ShowNewFood(row, col);
+                //megjelenitjuk az uj etelt
+                ShowNewFood(row, col); 
+            }
         }
     }
 }

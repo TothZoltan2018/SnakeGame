@@ -15,7 +15,7 @@ namespace SnakeGame.Model
         {
             HeadPosition = new ArenaPosition(rowPosition, columnPosition);
             Heading = SnakeHeadingEnum.InPlace;
-            Length = 4;
+            Length = 6;
             //gondoskodom arrol, hogy a lista valtozom listat tartalmazzon, nehogy 
             //object reference null kivetel tortenjen
             //https://netacademia.blog.hu/2017/05/30/miert_ne_hasznaljunk_null-t
