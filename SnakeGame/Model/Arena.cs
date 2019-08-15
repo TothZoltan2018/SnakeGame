@@ -2,8 +2,10 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 
@@ -240,6 +242,21 @@ namespace SnakeGame.Model
             var image = GetImage(rowPosition, columnPosition);
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
             image.Foreground = Brushes.Red;
+
+            var paint = new Ellipse();
+
+            //a megjelenites utan az aktualis meretet egy elemnek az "ActualHeight"-tal lehet lekerdezni.
+            paint.Height = View.ArenaCanvas.ActualHeight / RowCount;
+            paint.Width = View.ArenaCanvas.ActualWidth / ColumnCount;
+
+            paint.Fill = Brushes.Red;
+
+            //A kirajzolando etel koordinatainak szamitasa
+            Canvas.SetTop(paint, rowPosition * paint.Height);
+            Canvas.SetLeft(paint, columnPosition * paint.Width);
+
+            //Hozzadjuk a Canvas-hoz, ezzel megjelenitjuk
+            View.ArenaCanvas.Children.Add(paint);
         }
 
         private FontAwesome.WPF.ImageAwesome GetImage(int rowPosition, int columnPosition)
