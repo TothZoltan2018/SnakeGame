@@ -23,6 +23,7 @@ namespace SnakeGame.Model
         private int RowCount;
         private int ColumnCount;
         private Random Random; //A tipus nevet is hasznalhatom valtozonevkent
+        private Random rndFood;
         //Az etelek nyilvantartasa
         private Foods foods;
         //a megevett etelek szama
@@ -51,6 +52,7 @@ namespace SnakeGame.Model
             ColumnCount = 20;
 
             Random = new Random();
+            rndFood = new Random();
 
             foods = new Foods();
 
@@ -165,11 +167,10 @@ namespace SnakeGame.Model
 
                 foodsHaveEatenCount++;
 
-                //egyek nojon a kigyo hpssza
+                //egyek nojon a kigyo hossza
                 snake.Length++;
 
                 //es gyorsuljon is
-
 
                 //megjelenitjuk, hogy mennyit ettunk
                 View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
@@ -310,8 +311,7 @@ namespace SnakeGame.Model
             int row;
             int col;
 
-            var rnd = new Random();
-            foodNum = rnd.Next(1, foodNum+1);
+            foodNum = rndFood.Next(1, foodNum+1);
             
             for (int i = 0; i < foodNum; i++)
             {
