@@ -11,13 +11,13 @@ namespace SnakeGame.Model
         public Foods()
         {
             //null objcet pattern
-            FoodPositions = new List<ArenaPosition>();
+            FoodPositions = new List<CanvasPosition>();
         }
-        public List<ArenaPosition> FoodPositions { get; set; }
+        public List<CanvasPosition> FoodPositions { get; set; }
 
-        internal void Add(int row, int col)
+        internal void Add(int row, int col, System.Windows.UIElement paint)
         {
-            FoodPositions.Add(new ArenaPosition(row, col));
+            FoodPositions.Add(new CanvasPosition(row, col, paint));
         }
 
         internal void Remove(int rowPosition, int columnPosition)

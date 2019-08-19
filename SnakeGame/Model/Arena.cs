@@ -237,12 +237,24 @@ namespace SnakeGame.Model
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
         }
 
-        private void ShowNewFood(int rowPosition, int columnPosition)
+        private UIElement ShowNewFood(int rowPosition, int columnPosition)
         {
             var image = GetImage(rowPosition, columnPosition);
             image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
             image.Foreground = Brushes.Red;
 
+            var paint = PaintOnCanvas(rowPosition, columnPosition);
+            return paint;            
+        }
+
+        /// <summary>
+        /// Rajzol egy elemet (Ellipszist a Canvas-ra)
+        /// </summary>
+        /// <param name="rowPosition"></param>
+        /// <param name="columnPosition"></param>
+        /// <returns>A kirajzolt elem, amit aztan torolni kell</returns>
+        private UIElement PaintOnCanvas(int rowPosition, int columnPosition)
+        {
             var paint = new Ellipse();
 
             //a megjelenites utan az aktualis meretet egy elemnek az "ActualHeight"-tal lehet lekerdezni.
@@ -257,6 +269,17 @@ namespace SnakeGame.Model
 
             //Hozzadjuk a Canvas-hoz, ezzel megjelenitjuk
             View.ArenaCanvas.Children.Add(paint);
+
+            return paint;
+        }
+
+        /// <summary>
+        /// Ez a kirajzolofuggveny parja, torli a kirajzolt elemet
+        /// </summary>
+        /// <param name="paint">A rajzolaskor hasznalt elemet kell visszakuldeni</param>
+        private void EraseFromCanvas(UIElement paint)
+        {
+            View.ArenaCanvas.Children.Remove(paint);
         }
 
         private FontAwesome.WPF.ImageAwesome GetImage(int rowPosition, int columnPosition)
@@ -340,20 +363,18 @@ namespace SnakeGame.Model
                     col = Random.Next(0, ColumnCount - 1);
 
                 } while (snake.HeadPosition.RowPosition == row && snake.HeadPosition.ColumnPosition == col
-                                        || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col)
                                         || foods.FoodPositions.Any(x => x.RowPosition == row && x.ColumnPosition == col)
-                                        );
-                //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
+                                        || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col));
+                                        //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
 
                 //adminisztraljuk az adatokat
 
-                //ezzel is jo, de...
-                //foods.FoodPositions.Add(new ArenaPosition(row, col));
-                //Ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
-                foods.Add(row, col);
-
                 //megjelenitjuk az uj etelt
-                ShowNewFood(row, col); 
+                var paint = ShowNewFood(row, col);
+                //ezzel is jo,
+                //foods.FoodPositions.Add(new ArenaPosition(row, col));
+                //de...ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
+                foods.Add(row, col, paint);
             }
         }
     }
