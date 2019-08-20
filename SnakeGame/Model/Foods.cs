@@ -20,7 +20,13 @@ namespace SnakeGame.Model
             FoodPositions.Add(new CanvasPosition(row, col, paint));
         }
 
-        internal void Remove(int rowPosition, int columnPosition)
+        /// <summary>
+        /// Egy elem torlese az etelek kozul
+        /// </summary>
+        /// <param name="rowPosition"></param>
+        /// <param name="columnPosition"></param>
+        /// <returns>Azzal az etellel ter vissza, amit torolt</returns>
+        internal CanvasPosition Remove(int rowPosition, int columnPosition)
         {
             //Az x a FoodPositions lista egy eleme
             //ez a sor akkor fut le, ha letezik pontosan egy elem, amire a feltetel igaz!
@@ -28,6 +34,8 @@ namespace SnakeGame.Model
             var foodToDelete = FoodPositions.Single(x => x.RowPosition == rowPosition 
                                                     && x.ColumnPosition == columnPosition);
             FoodPositions.Remove(foodToDelete);
+
+            return foodToDelete;
         }
     }
 }

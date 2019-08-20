@@ -8,13 +8,13 @@ using System.Windows;
 namespace SnakeGame.Model
 {
     class CanvasPosition : ArenaPosition
-    {
-        private UIElement paint;
+    {        
+        public UIElement Paint { get; set; }
 
         public CanvasPosition(int rowPosition, int columnPosition, UIElement paint) 
-            : base(rowPosition, columnPosition) //ezzel a hatterben letrejovo ososztaly peldanzositasa tortenik meg
+            : base(rowPosition, columnPosition) //ezzel a hatterben letrejovo ososztaly peldanyositasa tortenik meg
         { 
-            this.paint = paint;
+            Paint = paint;
         }
     }
 }

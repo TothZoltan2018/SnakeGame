@@ -162,10 +162,13 @@ namespace SnakeGame.Model
             //true: letezett es torolte, false: nem letezik
             if (foods.FoodPositions.Any(x => x.RowPosition == snake.HeadPosition.RowPosition
                                         && x.ColumnPosition == snake.HeadPosition.ColumnPosition))
-            {//ettunk: a kigyo feje el fogja tuntetni az etelt, 
+            {//ettunk: a kigyo feje el fogja tuntetni az etelt a gridrol
                 //igy csak adminisztralnunk 
                 //toroljuk az etelt az etelek kozul
-                foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+                var foodToDelete = foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+
+                //A canvas-rol viszont nekunk kell torolnunk
+                EraseFromCanvas(foodToDelete.Paint);
 
                 foodsHaveEatenCount++;
 
