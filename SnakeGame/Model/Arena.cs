@@ -215,39 +215,55 @@ namespace SnakeGame.Model
             //Todo: ki kell irni, hogy vege van           
             //Todo: lehetoseget adni az ujrajatszasra
         }
-
-        //todo: ebbol a 4 fgv-bol el lehetne tuntetni a duplikaciot
+        
         private void ShowEmptyArenaPosition(int rowPosition, int columnPosition)
         {
-            var image = GetImage(rowPosition, columnPosition);
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
-            image.Foreground = Brushes.Black;
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
         }
 
         private void ShowSnakeNeck(int rowPosition, int columnPosition)
         {
-            var image = GetImage(rowPosition, columnPosition);
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
-            image.Foreground = Brushes.Gray;
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeNeck);
         }
 
         private void ShowSnakeHead(int rowPosition, int columnPosition)
         {
-            //Ki kell rajzolni a kovetkezo poziciora a kigyo fejet            
-            var image = GetImage(rowPosition, columnPosition);
-            //ennek mar el lehet kerni az ikon tulajdonsagat
-            //A kigyofej megjelenitese Circle ikonnal
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeHead);
         }
 
         private UIElement ShowNewFood(int rowPosition, int columnPosition)
         {
-            var image = GetImage(rowPosition, columnPosition);
-            image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
-            image.Foreground = Brushes.Red;
-
+            //Rajzolas a Grid-re
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
+            //Rajzolas a Canvas-ra
             var paint = PaintOnCanvas(rowPosition, columnPosition);
-            return paint;            
+            //Visszakuldjuk a kirajzolt elemet a kesobbi torleshez
+            return paint;
+        }
+
+        private void PaintOnGrid(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType)
+        {            
+            var image = GetImage(rowPosition, columnPosition);
+            switch (visibleType)
+            {
+                case VisibleElementTypeEnum.SnakeHead:
+                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+                    break;
+                case VisibleElementTypeEnum.SnakeNeck:
+                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+                    image.Foreground = Brushes.Gray;
+                    break;
+                case VisibleElementTypeEnum.Food:
+                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
+                    image.Foreground = Brushes.Red;
+                    break;
+                case VisibleElementTypeEnum.EmptyArenaPosition:                    
+                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
+                    image.Foreground = Brushes.Black;
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>

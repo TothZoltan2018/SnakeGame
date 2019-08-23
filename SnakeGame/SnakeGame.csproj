@@ -78,6 +78,7 @@
     <Compile Include="Model\Foods.cs" />
     <Compile Include="Model\Snake.cs" />
     <Compile Include="Model\SnakeHeadingEnum.cs" />
+    <Compile Include="Model\VisibleElementTypeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
