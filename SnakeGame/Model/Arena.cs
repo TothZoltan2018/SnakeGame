@@ -216,27 +216,37 @@ namespace SnakeGame.Model
             //Todo: lehetoseget adni az ujrajatszasra
         }
         
-        private void ShowEmptyArenaPosition(int rowPosition, int columnPosition)
+        private UIElement ShowEmptyArenaPosition(int rowPosition, int columnPosition)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+
+            var paint =  PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+            return paint;
         }
 
-        private void ShowSnakeNeck(int rowPosition, int columnPosition)
+        private UIElement ShowSnakeNeck(int rowPosition, int columnPosition)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeNeck);
+
+            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeNeck);
+            return paint;
         }
 
-        private void ShowSnakeHead(int rowPosition, int columnPosition)
+        private UIElement ShowSnakeHead(int rowPosition, int columnPosition)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeHead);
+
+            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeHead);
+            return paint;
         }
 
         private UIElement ShowNewFood(int rowPosition, int columnPosition)
         {
             //Rajzolas a Grid-re
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
+
             //Rajzolas a Canvas-ra
-            var paint = PaintOnCanvas(rowPosition, columnPosition);
+            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
             //Visszakuldjuk a kirajzolt elemet a kesobbi torleshez
             return paint;
         }
@@ -272,7 +282,7 @@ namespace SnakeGame.Model
         /// <param name="rowPosition"></param>
         /// <param name="columnPosition"></param>
         /// <returns>A kirajzolt elem, amit aztan torolni kell</returns>
-        private UIElement PaintOnCanvas(int rowPosition, int columnPosition)
+        private UIElement PaintOnCanvas(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType)
         {
             var paint = new Ellipse();
 
@@ -280,7 +290,23 @@ namespace SnakeGame.Model
             paint.Height = View.ArenaCanvas.ActualHeight / RowCount;
             paint.Width = View.ArenaCanvas.ActualWidth / ColumnCount;
 
-            paint.Fill = Brushes.Red;
+            switch (visibleType)
+            {
+                case VisibleElementTypeEnum.SnakeHead:
+                    paint.Fill = Brushes.Black;
+                    break;
+                case VisibleElementTypeEnum.SnakeNeck:
+                    paint.Fill = Brushes.Gray;
+                    break;
+                case VisibleElementTypeEnum.Food:
+                    paint.Fill = Brushes.Red;
+                    break;
+                case VisibleElementTypeEnum.EmptyArenaPosition:
+                    paint.Fill = Brushes.Aquamarine;
+                    break;
+                default:
+                    break;
+            }           
 
             //A kirajzolando etel koordinatainak szamitasa
             Canvas.SetTop(paint, rowPosition * paint.Height);
