@@ -50,8 +50,8 @@ namespace SnakeGame.Model
 
             //az arena mereteinek beallitasa
             //todo: az arena meretezeset atvenni a Window Gridbol (ArenaGrid), nem pedig bedrotozni a meretet.
-            RowCount = 20;
-            ColumnCount = 20;
+            RowCount = View.ArenaGrid.RowDefinitions.Count;
+            ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
 
             Random = new Random();
             rndFood = new Random();
@@ -263,18 +263,24 @@ namespace SnakeGame.Model
             {
                 case VisibleElementTypeEnum.SnakeHead:
                     image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
+                    image.Foreground = Brushes.Black;
+                    image.Opacity = 1; //atallitjuk lathatora, hogy ahol korabban a kigyo mar jartm ott latszodjon
                     break;
                 case VisibleElementTypeEnum.SnakeNeck:
                     image.Icon = FontAwesome.WPF.FontAwesomeIcon.Circle;
                     image.Foreground = Brushes.Gray;
+                    image.Opacity = 1;
                     break;
                 case VisibleElementTypeEnum.Food:
                     image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
                     image.Foreground = Brushes.Red;
+                    image.Opacity = 1;
                     break;
                 case VisibleElementTypeEnum.EmptyArenaPosition:                    
                     image.Icon = FontAwesome.WPF.FontAwesomeIcon.SquareOutline;
-                    image.Foreground = Brushes.Black;
+                    //image.Icon = FontAwesome.WPF.FontAwesomeIcon.None; //ez nem mukudik, kis teglalapot hagy hatra...
+                    //image.Foreground = Brushes.White; //A mogotte levo szamon (megevett etelek szama) nyomot hagy, ezert ez sem jo
+                    image.Opacity = 0; //atallitjuk altlatszora, igy nem latszik.
                     break;
                 default:
                     break;
