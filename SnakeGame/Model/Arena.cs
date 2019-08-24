@@ -157,15 +157,14 @@ namespace SnakeGame.Model
                 return;
             }
 
-            //ellenorini, hogy ettunk -e? Kigyo feje vs etelek listaja
-            //Todo: helyezzuk at ezt az ellenorzest a Remove fgv-be, es adja vissza, hogy 
-            //true: letezett es torolte, false: nem letezik
-            if (foods.FoodPositions.Any(x => x.RowPosition == snake.HeadPosition.RowPosition
-                                        && x.ColumnPosition == snake.HeadPosition.ColumnPosition))
-            {//ettunk: a kigyo feje el fogja tuntetni az etelt a gridrol
-                //igy csak adminisztralnunk 
-                //toroljuk az etelt az etelek kozul
-                var foodToDelete = foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+            //ellenorini, hogy ettunk -e? Kigyo feje vs etelek listaja                
+            //megprobaljuk torolni az etelt az etelek kozul
+            var foodToDelete = foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+
+            if (foodToDelete != null)
+            {
+                //ettunk: a kigyo feje el fogja tuntetni az etelt a gridrol
+                //igy csak adminisztralnunk kell
 
                 //A canvas-rol viszont nekunk kell torolnunk
                 EraseFromCanvas(foodToDelete.Paint);
@@ -182,8 +181,8 @@ namespace SnakeGame.Model
 
                 //generalunk uj eteleket
                 GetNewFood(2);
-            }
 
+            }
             var paintHead = ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
             //mielott elmentjuk az uj fejet, azelott torolni kell a regit
             EraseFromCanvas(snake.HeadPosition.Paint);
@@ -408,8 +407,9 @@ namespace SnakeGame.Model
             int row;
             int col;
 
-            foodNum = rndFood.Next(1, foodNum+1);
-            
+            var limterOfNewFoods = rndFood.Next(0, 2);
+            foodNum = rndFood.Next(1, foodNum + limterOfNewFoods);
+
             for (int i = 0; i < foodNum; i++)
             {
                 do
