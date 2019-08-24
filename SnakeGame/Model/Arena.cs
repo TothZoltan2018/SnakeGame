@@ -184,14 +184,16 @@ namespace SnakeGame.Model
                 GetNewFood(2);
             }
 
+            var paintHead = ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+            //mielott elmentjuk az uj fejet, azelott torolni kell a regit
+            EraseFromCanvas(snake.HeadPosition.Paint);
 
-
-            ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
+            snake.HeadPosition.Paint = paintHead;
 
             //A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
-            ShowSnakeNeck(neck.RowPosition, neck.ColumnPosition);
+            var paintNeck = ShowSnakeNeck(neck.RowPosition, neck.ColumnPosition);
             //Viszont, a farok adataihoz a nyaknak hozza kell adodnia
-            snake.Tail.Add(new ArenaPosition(neck.RowPosition, neck.ColumnPosition));
+            snake.Tail.Add(new CanvasPosition(neck.RowPosition, neck.ColumnPosition, paintNeck));
 
             //Amig a kigyo hossza kisebb, mint aminek lennie kellene
             if (snake.Tail.Count < snake.Length)
@@ -202,7 +204,7 @@ namespace SnakeGame.Model
             {//Mar megvan a teljes hossz, ne legyen hosszabb; a kigyo legveget torolni kell, ami az elso elem a listaban
                 //Meg torles elott kell az info, hogy melyik ArenaPozicioban van, hogy oda visszarakjuk az eredeti racsot
                 var end = snake.Tail[0];
-                ShowEmptyArenaPosition(end.RowPosition, end.ColumnPosition);
+                ShowEmptyArenaPosition(end.RowPosition, end.ColumnPosition, end.Paint );
                 //majd az adatk kozul is toroljuk 
                 snake.Tail.RemoveAt(0);
             }
@@ -216,12 +218,15 @@ namespace SnakeGame.Model
             //Todo: lehetoseget adni az ujrajatszasra
         }
         
-        private UIElement ShowEmptyArenaPosition(int rowPosition, int columnPosition)
+        private void  ShowEmptyArenaPosition(int rowPosition, int columnPosition, UIElement paint)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-
-            var paint =  PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-            return paint;
+            
+            EraseFromCanvas(paint);
+            //A canvas eseteben nem kell az ures pozicio megjelenited, mert nem felulrajzoljuk a dolgokat, 
+            //hanem toroljuk a Canvas.Children-bol
+            //var paint =  PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+            //return paint;
         }
 
         private UIElement ShowSnakeNeck(int rowPosition, int columnPosition)
