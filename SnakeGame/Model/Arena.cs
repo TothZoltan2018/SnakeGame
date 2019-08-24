@@ -306,9 +306,10 @@ namespace SnakeGame.Model
                 case VisibleElementTypeEnum.Food:
                     paint.Fill = Brushes.Red;
                     break;
-                case VisibleElementTypeEnum.EmptyArenaPosition:
-                    paint.Fill = Brushes.Aquamarine;
-                    break;
+                //ilyen tobbe nem lesz, mert nem felulajzoljuk egy ures elemmel, hanem toroljuk a childrenbol.
+                //case VisibleElementTypeEnum.EmptyArenaPosition:
+                //    paint.Fill = Brushes.Aquamarine;
+                //    break;
                 default:
                     break;
             }           
