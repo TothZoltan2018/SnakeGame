@@ -20,6 +20,7 @@ namespace SnakeGame.Model
         private Snake snake;
         private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
+        private bool isGameOver;
         private TimeSpan playTime;
         //A tabla meretei
         private int RowCount;
@@ -35,30 +36,56 @@ namespace SnakeGame.Model
         {
             this.View = view;
 
+            InitializeGame();
+
+            Random = new Random();
+            rndFood = new Random();
+
+            foods = new Foods();
+        }
+
+        private void InitializeGame()
+        {
+            //az arena meretezeset atveszi a Window Gridbol (ArenaGrid)
+            RowCount = View.ArenaGrid.RowDefinitions.Count;
+            ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
+
+            //Ha ujrajatszas van, akkor torolni kell a tablat, pl. ures elemekkel a Grid eseteben
+            if (isGameOver)
+            {
+                for (int rowPosition = 0; rowPosition < RowCount; rowPosition++)
+                {
+                    for (int columnPosition = 0; columnPosition < ColumnCount; columnPosition++)
+                    {
+                        PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+                        //PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+                    }
+                }
+                //es eltuntetni a gameover feliratot
+                View.EndResultBorder.Visibility = Visibility.Hidden;
+                View.EndResultTextBlock.Visibility = Visibility.Hidden;
+
+                View.ArenaCanvas.Children.Clear();
+            }            
+
             //A jatekszabalyok megjelenitese
             View.GamePlayTextBlock.Visibility = System.Windows.Visibility.Visible;
+            View.GamePlayBorder.Visibility = System.Windows.Visibility.Visible;
 
             snake = new Snake(10, 10);
 
             StartPendulum();
 
             isStarted = false;
+            isGameOver = false;
 
-            playTime = TimeSpan.FromSeconds(120);
+            playTime = TimeSpan.FromSeconds(10);
             pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
             pendulumClock.Stop();
 
-            //az arena mereteinek beallitasa
-            //todo: az arena meretezeset atvenni a Window Gridbol (ArenaGrid), nem pedig bedrotozni a meretet.
-            RowCount = View.ArenaGrid.RowDefinitions.Count;
-            ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
-
-            Random = new Random();
-            rndFood = new Random();
-
-            foods = new Foods();
-
             foodsHaveEatenCount = 0;
+            //megjelenitjuk, hogy mennyit ettunk
+            View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
         }
 
         private void StartPendulum()
@@ -80,8 +107,8 @@ namespace SnakeGame.Model
             playTime -= TimeSpan.FromSeconds(1);
             if (playTime == TimeSpan.FromSeconds(0))
             {
-                //Todo Vege a jateknak
-
+                //Vege a jateknak
+                EndOfGame();
             }
 
             View.LabelPlaytime.Content = $"{playTime.Minutes:00}:{playTime.Seconds:00}";
@@ -89,7 +116,7 @@ namespace SnakeGame.Model
 
         private void ItsTimeForDisplay(object sender, EventArgs e)
         {
-            if (!isStarted)
+            if (!isStarted || isGameOver)
             {
                 return;
             }
@@ -213,8 +240,14 @@ namespace SnakeGame.Model
         {            
             pendulum.Stop();
             pendulumClock.Stop();
-            //Todo: ki kell irni, hogy vege van           
-            //Todo: lehetoseget adni az ujrajatszasra
+            //ki kell irni, hogy vege van   
+            View.EndResultTextBlock.Text = $"Game Over! Press space bar to start a new game!\nScore: {foodsHaveEatenCount}";
+            View.EndResultTextBlock.Visibility = Visibility.Visible;
+            View.EndResultBorder.Visibility = Visibility.Visible;
+                                                    
+            isStarted = false;
+            isGameOver = true;
+
         }
         
         private void  ShowEmptyArenaPosition(int rowPosition, int columnPosition, UIElement paint)
@@ -349,38 +382,37 @@ namespace SnakeGame.Model
 
         internal void KeyDown(KeyEventArgs e)
         {
-            //a jatek kezdesehez a 4 nyilbillentyu valamelyiket kell leutni
+            //A jatek kezdese
+            if ( !isGameOver && !isStarted &&
+                (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
+            {
+                StartNewGame();
+            }
+
+            //Ujrakezdes a jatek vege utan
+            if (isGameOver && !isStarted && e.Key == Key.Space)
+            {
+                InitializeGame();
+            }
+
+            //Normal jatekmenet: Le kell kezelni a billentyuleuteseket a kigyo iranyitasahoz
             switch (e.Key)
             {
                 case Key.Left:
-                case Key.Up:
-                case Key.Right:
-                case Key.Down:
-                    if (!isStarted)
-                    {
-                        StartNewGame();
-                    }
-
-                    //Le kell kezelni a billentyuleuteseket
-                    switch (e.Key)
-                    {
-                        case Key.Left:
-                            snake.Heading = SnakeHeadingEnum.Left;
-                            break;
-                        case Key.Up:
-                            snake.Heading = SnakeHeadingEnum.Up;
-                            break;
-                        case Key.Right:
-                            snake.Heading = SnakeHeadingEnum.Right;
-                            break;
-                        case Key.Down:
-                            snake.Heading = SnakeHeadingEnum.Down;
-                            break;
-                    }
-                    //Console.WriteLine($"A lenyomott bill: {e.Key}"); //Ez nekem nem mukodott...
-                    Debug.WriteLine($"A lenyomott bill: {e.Key}");
+                    snake.Heading = SnakeHeadingEnum.Left;
                     break;
-            }            
+                case Key.Up:
+                    snake.Heading = SnakeHeadingEnum.Up;
+                    break;
+                case Key.Right:
+                    snake.Heading = SnakeHeadingEnum.Right;
+                    break;
+                case Key.Down:
+                    snake.Heading = SnakeHeadingEnum.Down;
+                    break;
+            }
+            //Console.WriteLine($"A lenyomott bill: {e.Key}"); //Ez nekem nem mukodott...
+            Debug.WriteLine($"A lenyomott bill: {e.Key}");                                 
         }
 
         private void StartNewGame()
@@ -388,8 +420,12 @@ namespace SnakeGame.Model
             //Eltuntetjuk a jatekszabalyokat
             View.GamePlayBorder.Visibility = System.Windows.Visibility.Hidden;
             View.NumberOfMealsTextBlock.Visibility = System.Windows.Visibility.Visible;
+            View.EndResultBorder.Visibility = Visibility.Hidden;
+            View.EndResultTextBlock.Visibility = Visibility.Hidden;
+
             View.ArenaGrid.Visibility = System.Windows.Visibility.Visible;
             isStarted = true;
+            //isGameOver = false;
 
             //A jatekido visszaszamlalo inditasa
             pendulumClock.Start();
