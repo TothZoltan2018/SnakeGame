@@ -298,30 +298,35 @@ namespace SnakeGame.Model
             for (int i = 0; i < foods.FoodPositions.Count; i++)
             {
                 var age = foods.FoodPositions[i].BornTime - playTime;
-                if (age.Seconds < 3)
+                if (age.Seconds < 10)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.UnMatured;                    
                 }
-                else if (age.Seconds < 6)
+                else if (age.Seconds < 27)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.Matured;
                 }
-                else if (age.Seconds < 9)
+                else if (age.Seconds < 32)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.WellMatured;
                 }
-                else if (age.Seconds < 15)
+                else if (age.Seconds < 50)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.Rothing;
                 }
-                else
+                else if (foods.FoodPositions.Count > 1)
                 {
                     //todo: remove from foodpositions
+                    //Csak a Grid-rol:
+                    PaintOnGrid(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+                    //ToDo: A Canvasrol is
+                    //ShowEmptyArenaPosition(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, paint);
+                    var foodToDelete = foods.Remove(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition);
+                    Debug.WriteLine(foods.FoodPositions.Count);
+                    return; //a most torolt etelet nehogy megjelenitsuk az if agak utan                    
                 }
-
-                ShowFood(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition ,foods.FoodPositions[i].Maturity);
-            } 
-            
+                ShowFood(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, foods.FoodPositions[i].Maturity);
+            }             
         }
 
         private void PaintOnGrid(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType, FoodAgeEnum foodAge = FoodAgeEnum.UnMatured)
