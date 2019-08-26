@@ -26,7 +26,7 @@ namespace SnakeGame.Model
         /// <param name="rowPosition"></param>
         /// <param name="columnPosition"></param>
         /// <returns>Azzal az etellel ter vissza, amit torolt</returns>
-        internal CanvasPosition Remove(int rowPosition, int columnPosition)
+        internal FoodPosition Remove(int rowPosition, int columnPosition)
         {
             //Az x a FoodPositions lista egy eleme
             //a Single() akkor fut le, ha letezik pontosan egy elem, amire a feltetel igaz!
@@ -41,8 +41,5 @@ namespace SnakeGame.Model
 
             return foodToDelete;
         }
-
-
-
     }
 }

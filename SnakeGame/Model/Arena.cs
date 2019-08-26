@@ -30,8 +30,8 @@ namespace SnakeGame.Model
         private Random rndFood;
         //Az etelek nyilvantartasa
         private Foods foods;
-        //a megevett etelek szama
-        private int foodsHaveEatenCount;
+        //A megevett etelek utan jaro pontok
+        private int score;
 
         public Arena(MainWindow view)
         {
@@ -40,9 +40,7 @@ namespace SnakeGame.Model
             InitializeGame();
 
             Random = new Random();
-            rndFood = new Random();
-
-            
+            rndFood = new Random();            
         }
 
         private void InitializeGame()
@@ -83,10 +81,10 @@ namespace SnakeGame.Model
             playTime = startPlayTime;
             pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
             pendulumClock.Stop();
-
-            foodsHaveEatenCount = 0;
-            //megjelenitjuk, hogy mennyit ettunk
-            View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
+                       
+            score = 0;
+            //megjelenitjuk, hogy mennyit ettunk            
+            View.NumberOfMealsTextBlock.Text = score.ToString();
         }
 
         private void StartPendulum()
@@ -193,22 +191,21 @@ namespace SnakeGame.Model
             {
                 //ettunk: a kigyo feje el fogja tuntetni az etelt a gridrol
                 //igy csak adminisztralnunk kell
+                Scoring(foodToDelete);
 
                 //A canvas-rol viszont nekunk kell torolnunk
                 EraseFromCanvas(foodToDelete.Paint);
-
-                foodsHaveEatenCount++;
-
+                
                 //egyek nojon a kigyo hossza
                 snake.Length++;
 
                 //es gyorsuljon is
 
-                //megjelenitjuk, hogy mennyit ettunk
-                View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
-                                
+                //megjelenitjuk, hogy mennyit ettunk                
+                View.NumberOfMealsTextBlock.Text = score.ToString();
+
                 //generalunk uj eteleket
-                GetNewFood(2);               
+                GetNewFood(2);
 
             }
             var paintHead = ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
@@ -238,12 +235,33 @@ namespace SnakeGame.Model
             UpdateFoods();
         }
 
+        private void Scoring(FoodPosition foodToDelete)
+        {
+            switch (foodToDelete.Maturity)
+            {
+                case FoodAgeEnum.UnMatured:
+                    score += 100;
+                    break;
+                case FoodAgeEnum.Matured:
+                    score += 200;
+                    break;
+                case FoodAgeEnum.WellMatured:
+                    score += 500;
+                    break;
+                case FoodAgeEnum.Rothing:
+                    score -= 1000;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void EndOfGame()
         {            
             pendulum.Stop();
             pendulumClock.Stop();
             //ki kell irni, hogy vege van   
-            View.EndResultTextBlock.Text = $"Game Over! Press space bar to start a new game!\nScore: {foodsHaveEatenCount}";
+            View.EndResultTextBlock.Text = $"Game Over! Press space bar to start a new game!\nScore: {score}";
             View.EndResultTextBlock.Visibility = Visibility.Visible;
             View.EndResultBorder.Visibility = Visibility.Visible;
                                                     
@@ -501,8 +519,7 @@ namespace SnakeGame.Model
             int col;
 
             //var limterOfNewFoods = rndFood.Next(0, 2);
-            //foodNum = rndFood.Next(1, foodNum + limterOfNewFoods);
-            foodNum = rndFood.Next(1, foodNum + 3);
+            foodNum = rndFood.Next(1, foodNum + 1);            
 
             for (int i = 0; i < foodNum; i++)
             {
