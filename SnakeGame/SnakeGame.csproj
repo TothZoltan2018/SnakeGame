@@ -75,6 +75,8 @@
     <Compile Include="Model\Arena.cs" />
     <Compile Include="Model\ArenaPosition.cs" />
     <Compile Include="Model\CanvasPosition.cs" />
+    <Compile Include="Model\FoodAgeEnum.cs" />
+    <Compile Include="Model\FoodPosition.cs" />
     <Compile Include="Model\Foods.cs" />
     <Compile Include="Model\Snake.cs" />
     <Compile Include="Model\SnakeHeadingEnum.cs" />

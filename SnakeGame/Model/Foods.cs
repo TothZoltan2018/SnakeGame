@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 namespace SnakeGame.Model
 {
     class Foods
-    {
+    {        
         public Foods()
         {
-            //null objcet pattern
-            FoodPositions = new List<CanvasPosition>();
+            //null object pattern
+            FoodPositions = new List<FoodPosition>();
         }
-        public List<CanvasPosition> FoodPositions { get; set; }
+        public List<FoodPosition> FoodPositions { get; set; }
 
-        internal void Add(int row, int col, System.Windows.UIElement paint)
+        internal void Add(int row, int col, System.Windows.UIElement paint, TimeSpan currentPlayTime, FoodAgeEnum maturity)
         {
-            FoodPositions.Add(new CanvasPosition(row, col, paint));
+            FoodPositions.Add(new FoodPosition(row, col, paint, currentPlayTime, maturity));            
         }
 
         /// <summary>
@@ -41,5 +41,8 @@ namespace SnakeGame.Model
 
             return foodToDelete;
         }
+
+
+
     }
 }

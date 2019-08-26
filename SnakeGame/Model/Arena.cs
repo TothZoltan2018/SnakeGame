@@ -21,6 +21,7 @@ namespace SnakeGame.Model
         private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
         private bool isGameOver;
+        public TimeSpan startPlayTime => TimeSpan.FromSeconds(130); //csak olvashato property
         private TimeSpan playTime;
         //A tabla meretei
         private int RowCount;
@@ -41,11 +42,12 @@ namespace SnakeGame.Model
             Random = new Random();
             rndFood = new Random();
 
-            foods = new Foods();
+            
         }
 
         private void InitializeGame()
         {
+            foods = new Foods();
             //az arena meretezeset atveszi a Window Gridbol (ArenaGrid)
             RowCount = View.ArenaGrid.RowDefinitions.Count;
             ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
@@ -77,9 +79,8 @@ namespace SnakeGame.Model
             StartPendulum();
 
             isStarted = false;
-            isGameOver = false;
-
-            playTime = TimeSpan.FromSeconds(10);
+            isGameOver = false;            
+            playTime = startPlayTime;
             pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
             pendulumClock.Stop();
 
@@ -205,9 +206,9 @@ namespace SnakeGame.Model
 
                 //megjelenitjuk, hogy mennyit ettunk
                 View.NumberOfMealsTextBlock.Text = foodsHaveEatenCount.ToString();
-
+                                
                 //generalunk uj eteleket
-                GetNewFood(2);
+                GetNewFood(2);               
 
             }
             var paintHead = ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
@@ -234,6 +235,7 @@ namespace SnakeGame.Model
                 //majd az adatk kozul is toroljuk 
                 snake.Tail.RemoveAt(0);
             }
+            UpdateFoods();
         }
 
         private void EndOfGame()
@@ -277,18 +279,52 @@ namespace SnakeGame.Model
             return paint;
         }
 
-        private UIElement ShowNewFood(int rowPosition, int columnPosition)
+        private UIElement ShowFood(int rowPosition, int columnPosition, FoodAgeEnum foodAge = FoodAgeEnum.UnMatured)
         {
             //Rajzolas a Grid-re
-            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
-
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.Food, foodAge);
+            
             //Rajzolas a Canvas-ra
             var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
             //Visszakuldjuk a kirajzolt elemet a kesobbi torleshez
             return paint;
         }
 
-        private void PaintOnGrid(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType)
+        /// <summary>
+        /// az aktualis jatekido es a szuletesi ido alapjan frissiti a foodPositions-ban az erettseg merteket
+        /// </summary>
+        void UpdateFoods()
+        {
+            for (int i = 0; i < foods.FoodPositions.Count; i++)
+            {
+                var age = foods.FoodPositions[i].BornTime - playTime;
+                if (age.Seconds < 3)
+                {
+                    foods.FoodPositions[i].Maturity = FoodAgeEnum.UnMatured;                    
+                }
+                else if (age.Seconds < 6)
+                {
+                    foods.FoodPositions[i].Maturity = FoodAgeEnum.Matured;
+                }
+                else if (age.Seconds < 9)
+                {
+                    foods.FoodPositions[i].Maturity = FoodAgeEnum.WellMatured;
+                }
+                else if (age.Seconds < 15)
+                {
+                    foods.FoodPositions[i].Maturity = FoodAgeEnum.Rothing;
+                }
+                else
+                {
+                    //todo: remove from foodpositions
+                }
+
+                ShowFood(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition ,foods.FoodPositions[i].Maturity);
+            } 
+            
+        }
+
+        private void PaintOnGrid(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType, FoodAgeEnum foodAge = FoodAgeEnum.UnMatured)
         {            
             var image = GetImage(rowPosition, columnPosition);
             switch (visibleType)
@@ -304,8 +340,24 @@ namespace SnakeGame.Model
                     image.Opacity = 1;
                     break;
                 case VisibleElementTypeEnum.Food:
-                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;
-                    image.Foreground = Brushes.Red;
+                    switch (foodAge)
+                    {
+                        case FoodAgeEnum.UnMatured:
+                            image.Foreground = Brushes.Green;
+                            break;
+                        case FoodAgeEnum.Matured:
+                            image.Foreground = Brushes.Yellow;
+                            break;
+                        case FoodAgeEnum.WellMatured:
+                            image.Foreground = Brushes.Red;
+                            break;
+                        case FoodAgeEnum.Rothing:
+                            image.Foreground = Brushes.SaddleBrown;
+                            break;
+                        default:
+                            break;
+                    }
+                    image.Icon = FontAwesome.WPF.FontAwesomeIcon.Apple;                    
                     image.Opacity = 1;
                     break;
                 case VisibleElementTypeEnum.EmptyArenaPosition:                    
@@ -443,8 +495,9 @@ namespace SnakeGame.Model
             int row;
             int col;
 
-            var limterOfNewFoods = rndFood.Next(0, 2);
-            foodNum = rndFood.Next(1, foodNum + limterOfNewFoods);
+            //var limterOfNewFoods = rndFood.Next(0, 2);
+            //foodNum = rndFood.Next(1, foodNum + limterOfNewFoods);
+            foodNum = rndFood.Next(1, foodNum + 3);
 
             for (int i = 0; i < foodNum; i++)
             {
@@ -463,11 +516,11 @@ namespace SnakeGame.Model
                 //adminisztraljuk az adatokat
 
                 //megjelenitjuk az uj etelt
-                var paint = ShowNewFood(row, col);
+                var paint = ShowFood(row, col);
                 //ezzel is jo,
                 //foods.FoodPositions.Add(new ArenaPosition(row, col));
                 //de...ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
-                foods.Add(row, col, paint);
+                foods.Add(row, col, paint, playTime, FoodAgeEnum.UnMatured);//Todo: folyt kov
             }
         }
     }
