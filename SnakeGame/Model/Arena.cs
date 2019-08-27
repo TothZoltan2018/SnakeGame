@@ -334,13 +334,14 @@ namespace SnakeGame.Model
                 }
                 else if (foods.FoodPositions.Count > 1)
                 {
-                    //todo: remove from foodpositions
+                    //remove from foodpositions
                     //Csak a Grid-rol:
                     PaintOnGrid(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
                     //ToDo: A Canvasrol is
                     //ShowEmptyArenaPosition(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, paint);
-                    var foodToDelete = foods.Remove(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition);
+                    foods.Remove(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition);
                     Debug.WriteLine(foods.FoodPositions.Count);
+                    score -=  25; //pazaroltunk...
                     return; //a most torolt etelet nehogy megjelenitsuk az if agak utan                    
                 }
                 ShowFood(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, foods.FoodPositions[i].Maturity);
