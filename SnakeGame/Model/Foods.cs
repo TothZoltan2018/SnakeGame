@@ -15,9 +15,9 @@ namespace SnakeGame.Model
         }
         public List<FoodPosition> FoodPositions { get; set; }
 
-        internal void Add(int row, int col, System.Windows.UIElement paint, TimeSpan currentPlayTime, FoodAgeEnum maturity)
+        internal void Add(int row, int col, TimeSpan currentPlayTime, FoodAgeEnum maturity)
         {
-            FoodPositions.Add(new FoodPosition(row, col, paint, currentPlayTime, maturity));            
+            FoodPositions.Add(new FoodPosition(row, col, currentPlayTime, maturity));                        
         }
 
         /// <summary>

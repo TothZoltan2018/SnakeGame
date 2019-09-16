@@ -57,15 +57,12 @@ namespace SnakeGame.Model
                 {
                     for (int columnPosition = 0; columnPosition < ColumnCount; columnPosition++)
                     {
-                        PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-                        //PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
+                        PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);                        
                     }
                 }
                 //es eltuntetni a gameover feliratot
                 View.EndResultBorder.Visibility = Visibility.Hidden;
-                View.EndResultTextBlock.Visibility = Visibility.Hidden;
-
-                View.ArenaCanvas.Children.Clear();
+                View.EndResultTextBlock.Visibility = Visibility.Hidden;                
             }            
 
             //A jatekszabalyok megjelenitese
@@ -193,9 +190,6 @@ namespace SnakeGame.Model
                 //igy csak adminisztralnunk kell
                 Scoring(foodToDelete);
 
-                //A canvas-rol viszont nekunk kell torolnunk
-                EraseFromCanvas(foodToDelete.Paint);
-                
                 //egyek nojon a kigyo hossza
                 snake.Length++;
 
@@ -208,16 +202,12 @@ namespace SnakeGame.Model
                 GetNewFood(2);
 
             }
-            var paintHead = ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
-            //mielott elmentjuk az uj fejet, azelott torolni kell a regit
-            EraseFromCanvas(snake.HeadPosition.Paint);
-
-            snake.HeadPosition.Paint = paintHead;
+            ShowSnakeHead(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
 
             //A kigyo fejebol nyak lesz, ennek megfeleloen kell megjeleniteni
-            var paintNeck = ShowSnakeNeck(neck.RowPosition, neck.ColumnPosition);
+            ShowSnakeNeck(neck.RowPosition, neck.ColumnPosition);
             //Viszont, a farok adataihoz a nyaknak hozza kell adodnia
-            snake.Tail.Add(new CanvasPosition(neck.RowPosition, neck.ColumnPosition, paintNeck));
+            snake.Tail.Add(new ArenaPosition(neck.RowPosition, neck.ColumnPosition));
 
             //Amig a kigyo hossza kisebb, mint aminek lennie kellene
             if (snake.Tail.Count < snake.Length)
@@ -228,7 +218,7 @@ namespace SnakeGame.Model
             {//Mar megvan a teljes hossz, ne legyen hosszabb; a kigyo legveget torolni kell, ami az elso elem a listaban
                 //Meg torles elott kell az info, hogy melyik ArenaPozicioban van, hogy oda visszarakjuk az eredeti racsot
                 var end = snake.Tail[0];
-                ShowEmptyArenaPosition(end.RowPosition, end.ColumnPosition, end.Paint );
+                ShowEmptyArenaPosition(end.RowPosition, end.ColumnPosition );
                 //majd az adatk kozul is toroljuk 
                 snake.Tail.RemoveAt(0);
             }
@@ -270,43 +260,28 @@ namespace SnakeGame.Model
 
         }
         
-        private void  ShowEmptyArenaPosition(int rowPosition, int columnPosition, UIElement paint)
+        private void  ShowEmptyArenaPosition(int rowPosition, int columnPosition)
         {
-            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-            
-            EraseFromCanvas(paint);
-            //A canvas eseteben nem kell az ures pozicio megjelenited, mert nem felulrajzoljuk a dolgokat, 
-            //hanem toroljuk a Canvas.Children-bol
-            //var paint =  PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-            //return paint;
+            PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.EmptyArenaPosition);            
         }
 
-        private UIElement ShowSnakeNeck(int rowPosition, int columnPosition)
+        private void ShowSnakeNeck(int rowPosition, int columnPosition)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeNeck);
+         }
 
-            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeNeck);
-            return paint;
-        }
-
-        private UIElement ShowSnakeHead(int rowPosition, int columnPosition)
+        private void ShowSnakeHead(int rowPosition, int columnPosition)
         {
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeHead);
 
-            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.SnakeHead);
-            return paint;
         }
 
-        private UIElement ShowFood(int rowPosition, int columnPosition, FoodAgeEnum foodAge = FoodAgeEnum.UnMatured)
+        private void ShowFood(int rowPosition, int columnPosition, FoodAgeEnum foodAge = FoodAgeEnum.UnMatured)
         {
             //Rajzolas a Grid-re
             PaintOnGrid(rowPosition, columnPosition, VisibleElementTypeEnum.Food, foodAge);
             
-            //Rajzolas a Canvas-ra
-            var paint = PaintOnCanvas(rowPosition, columnPosition, VisibleElementTypeEnum.Food);
-            //Visszakuldjuk a kirajzolt elemet a kesobbi torleshez
-            return paint;
-        }
+       }
 
         /// <summary>
         /// az aktualis jatekido es a szuletesi ido alapjan frissiti a foodPositions-ban az erettseg merteket
@@ -334,11 +309,8 @@ namespace SnakeGame.Model
                 }
                 else if (foods.FoodPositions.Count > 1)
                 {
-                    //remove from foodpositions
-                    //Csak a Grid-rol:
+                    //remove from foodpositions                    
                     PaintOnGrid(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, VisibleElementTypeEnum.EmptyArenaPosition);
-                    //ToDo: A Canvasrol is
-                    //ShowEmptyArenaPosition(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition, paint);
                     foods.Remove(foods.FoodPositions[i].RowPosition, foods.FoodPositions[i].ColumnPosition);
                     Debug.WriteLine(foods.FoodPositions.Count);
                     score -=  25; //pazaroltunk...
@@ -393,58 +365,6 @@ namespace SnakeGame.Model
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// Rajzol egy elemet (Ellipszist a Canvas-ra)
-        /// </summary>
-        /// <param name="rowPosition"></param>
-        /// <param name="columnPosition"></param>
-        /// <returns>A kirajzolt elem, amit aztan torolni kell</returns>
-        private UIElement PaintOnCanvas(int rowPosition, int columnPosition, VisibleElementTypeEnum visibleType)
-        {
-            var paint = new Ellipse();
-
-            //a megjelenites utan az aktualis meretet egy elemnek az "ActualHeight"-tal lehet lekerdezni.
-            paint.Height = View.ArenaCanvas.ActualHeight / RowCount;
-            paint.Width = View.ArenaCanvas.ActualWidth / ColumnCount;
-
-            switch (visibleType)
-            {
-                case VisibleElementTypeEnum.SnakeHead:
-                    paint.Fill = Brushes.Black;
-                    break;
-                case VisibleElementTypeEnum.SnakeNeck:
-                    paint.Fill = Brushes.Gray;
-                    break;
-                case VisibleElementTypeEnum.Food:
-                    paint.Fill = Brushes.Red;
-                    break;
-                //ilyen tobbe nem lesz, mert nem felulajzoljuk egy ures elemmel, hanem toroljuk a childrenbol.
-                //case VisibleElementTypeEnum.EmptyArenaPosition:
-                //    paint.Fill = Brushes.Aquamarine;
-                //    break;
-                default:
-                    break;
-            }           
-
-            //A kirajzolando etel koordinatainak szamitasa
-            Canvas.SetTop(paint, rowPosition * paint.Height);
-            Canvas.SetLeft(paint, columnPosition * paint.Width);
-
-            //Hozzadjuk a Canvas-hoz, ezzel megjelenitjuk
-            View.ArenaCanvas.Children.Add(paint);
-
-            return paint;
-        }
-
-        /// <summary>
-        /// Ez a kirajzolofuggveny parja, torli a kirajzolt elemet
-        /// </summary>
-        /// <param name="paint">A rajzolaskor hasznalt elemet kell visszakuldeni</param>
-        private void EraseFromCanvas(UIElement paint)
-        {
-            View.ArenaCanvas.Children.Remove(paint);
         }
 
         private FontAwesome.WPF.ImageAwesome GetImage(int rowPosition, int columnPosition)
@@ -539,11 +459,11 @@ namespace SnakeGame.Model
                 //adminisztraljuk az adatokat
 
                 //megjelenitjuk az uj etelt
-                var paint = ShowFood(row, col);
+                ShowFood(row, col);
                 //ezzel is jo,
                 //foods.FoodPositions.Add(new ArenaPosition(row, col));
                 //de...ez meg jobb: Csinalunk egz sajat Add metodust a foods osztalyban, ami a fenti sort implementalja...
-                foods.Add(row, col, paint, playTime, FoodAgeEnum.UnMatured);//Todo: folyt kov
+                foods.Add(row, col, playTime, FoodAgeEnum.UnMatured);//Todo: folyt kov
             }
         }
     }

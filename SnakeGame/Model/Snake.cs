@@ -14,17 +14,17 @@ namespace SnakeGame.Model
         public Snake(int rowPosition, int columnPosition)
         {
             //ilyenkor (a jatek elejen) nincs megjelenitve semmi, igy nincs ilyen adatunk, ezert a null
-            HeadPosition = new CanvasPosition(rowPosition, columnPosition, null);
+            HeadPosition = new ArenaPosition(rowPosition, columnPosition);
             Heading = SnakeHeadingEnum.InPlace;
             Length = 6;
             //gondoskodom arrol, hogy a lista valtozom listat tartalmazzon, nehogy 
             //object reference null kivetel tortenjen
             //https://netacademia.blog.hu/2017/05/30/miert_ne_hasznaljunk_null-t
-            Tail = new List<CanvasPosition>();
+            Tail = new List<ArenaPosition>();
         }
 
         //Tudnia kell, hogy hol van a feje
-        public CanvasPosition HeadPosition { get; set; }
+        public ArenaPosition HeadPosition { get; set; }
 
         //Tudnia kell, hogy merre megy eppen
         public SnakeHeadingEnum Heading { get; set; }
@@ -33,7 +33,7 @@ namespace SnakeGame.Model
         /// <summary>
         /// Ehhez nyilvan kell tartanunk a kigyo farkanak pontjait egy listaban
         /// </summary>
-        public List<CanvasPosition> Tail { get; set; }
+        public List<ArenaPosition> Tail { get; set; }
 
         public int Length { get; set; }
         
