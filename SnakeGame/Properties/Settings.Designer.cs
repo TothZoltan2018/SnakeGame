@@ -25,7 +25,7 @@ namespace SnakeGame.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:01:20")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:02:20")]
         public global::System.TimeSpan Playtime {
             get {
                 return ((global::System.TimeSpan)(this["Playtime"]));
@@ -80,6 +80,114 @@ namespace SnakeGame.Properties {
             }
             set {
                 this["FoodRothingTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:08")]
+        public global::System.TimeSpan SickPeriod {
+            get {
+                return ((global::System.TimeSpan)(this["SickPeriod"]));
+            }
+            set {
+                this["SickPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int SickSpeed {
+            get {
+                return ((int)(this["SickSpeed"]));
+            }
+            set {
+                this["SickSpeed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int RowMin {
+            get {
+                return ((int)(this["RowMin"]));
+            }
+            set {
+                this["RowMin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public int RowMax {
+            get {
+                return ((int)(this["RowMax"]));
+            }
+            set {
+                this["RowMax"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public int ColMax {
+            get {
+                return ((int)(this["ColMax"]));
+            }
+            set {
+                this["ColMax"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int ColMin {
+            get {
+                return ((int)(this["ColMin"]));
+            }
+            set {
+                this["ColMin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int scoreToExtendFoodArea {
+            get {
+                return ((int)(this["scoreToExtendFoodArea"]));
+            }
+            set {
+                this["scoreToExtendFoodArea"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int AgingPerSecond {
+            get {
+                return ((int)(this["AgingPerSecond"]));
+            }
+            set {
+                this["AgingPerSecond"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int AgingPerChangeHeading {
+            get {
+                return ((int)(this["AgingPerChangeHeading"]));
+            }
+            set {
+                this["AgingPerChangeHeading"] = value;
             }
         }
     }

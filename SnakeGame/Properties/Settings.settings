@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="Playtime" Type="System.TimeSpan" Scope="User">
-      <Value Profile="(Default)">00:01:20</Value>
+      <Value Profile="(Default)">00:02:20</Value>
     </Setting>
     <Setting Name="FoodUnmaturedTime" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
@@ -16,6 +16,33 @@
     </Setting>
     <Setting Name="FoodRothingTime" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="SickPeriod" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:00:08</Value>
+    </Setting>
+    <Setting Name="SickSpeed" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="RowMin" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="RowMax" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="ColMax" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="ColMin" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="scoreToExtendFoodArea" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="AgingPerSecond" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="AgingPerChangeHeading" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
     </Setting>
   </Settings>
 </SettingsFile>

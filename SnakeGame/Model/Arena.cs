@@ -30,6 +30,15 @@ namespace SnakeGame.Model
         private int foodMaturedTime = Properties.Settings.Default.FoodMaturedTime;
         private int foodWellmaturedTime = Properties.Settings.Default.FoodWellMaturedTime;
         private int foodRothingTime = Properties.Settings.Default.FoodRothingTime;
+        private TimeSpan sickPeriod = Properties.Settings.Default.SickPeriod;
+        private int sickSpeed = Properties.Settings.Default.SickSpeed;
+        private int rowMin = Properties.Settings.Default.RowMin;
+        private int rowMax = Properties.Settings.Default.RowMax;
+        private int colMin = Properties.Settings.Default.ColMin;
+        private int colMax = Properties.Settings.Default.ColMax;
+        private int scoreToExtendFoodArea = Properties.Settings.Default.scoreToExtendFoodArea;
+        private int agingPerSeconds = Properties.Settings.Default.AgingPerSecond;
+        private int agingPerChangeHeading = Properties.Settings.Default.AgingPerChangeHeading;
 
         private TimeSpan playTime;
         //A tabla meretei
@@ -42,7 +51,11 @@ namespace SnakeGame.Model
         //A megevett etelek utan jaro pontok
         private int score;
         //Ide szabad tenni uj etelet (vagy barmi mast)
-        private List<ArenaPosition> EmptyTableArenapositions;
+        private List<ArenaPosition> emptyArenaPositions;
+        private bool becomeSick;
+        private TimeSpan sicknessTime;
+        private bool isSicknessTimerOn;        
+
         public Arena(MainWindow view)
         {
             this.View = view;
@@ -55,32 +68,32 @@ namespace SnakeGame.Model
 
         /// <summary>
         /// Egy ArenaPosition tpusu lisat hoz letre, amiben a teljes tabla benne van. Ebbol fogjuk majd levonni a mar foglalt 
-        /// poyiciokat, ha uj etelet (vagy barmi mast) akarunk megjeleniteni.
+        /// poziciokat, ha uj etelet (vagy barmi mast) akarunk megjeleniteni.
+        /// Indulaskor kozepen vannak csak uj kajak, kesobb a teljes arenaban lehetnek, parameterezestol fuggoen. 
         /// </summary>
         /// <returns></returns>
-        List<ArenaPosition> GetEmptyTablePositions()
-        {
-            List<ArenaPosition> emptyArenaPositions = new List<ArenaPosition>();
-            
-            for (int rowPosition = 0; rowPosition < RowCount; rowPosition++)
+        List<ArenaPosition> GetEmptyArenaPositions(int rowMin, int rowMax, int colMin, int colMax)
+        {            
+            emptyArenaPositions.Clear();
+            for (int rowPosition = rowMin; rowPosition < rowMax; rowPosition++)
             {
-                for (int columnPosition = 0; columnPosition < ColumnCount; columnPosition++)
-                {            
+                for (int columnPosition = colMin; columnPosition < colMax; columnPosition++)
+                {
                     emptyArenaPositions.Add(new ArenaPosition(rowPosition, columnPosition));
                 }
             }
-
             return emptyArenaPositions;
         }
 
         private void InitializeGame()
         {
+            emptyArenaPositions = new List<ArenaPosition>();
             foods = new Foods();
             //az arena meretezeset atveszi a Window Gridbol (ArenaGrid)
             RowCount = View.ArenaGrid.RowDefinitions.Count;
             ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
 
-            EmptyTableArenapositions = GetEmptyTablePositions();
+            emptyArenaPositions = GetEmptyArenaPositions(rowMin, rowMax, colMin, colMax);
                         
             //Ha ujrajatszas van, akkor torolni kell a tablat, pl. ures elemekkel a Grid eseteben
             if (isGameOver)
@@ -103,6 +116,8 @@ namespace SnakeGame.Model
 
             snake = new Snake(RowCount/2, ColumnCount/2);
 
+            becomeSick = false;
+            isSicknessTimerOn = false;
             StartPendulum();
 
             isStarted = false;
@@ -111,7 +126,7 @@ namespace SnakeGame.Model
             pendulumClock = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Clockshock, Application.Current.Dispatcher);
             pendulumClock.Stop();
                        
-            score = 0;
+            score = 70;
 
             //megjelenitjuk, hogy mennyit ettunk            
             View.NumberOfMealsTextBlock.Text = score.ToString();
@@ -119,16 +134,25 @@ namespace SnakeGame.Model
 
         private void StartPendulum()
         {
+            int interval;
             //ha fut az ingaoram, akkor megallitjuk
             if (pendulum != null && pendulum.IsEnabled)
             {
                 pendulum.Stop();
             }
 
-            //ujrainditjuk, vagy elinditjuk a kigyo hosszanak megfeleloen
-            var interval = 2000 / snake.Length;
+            if (isSicknessTimerOn)
+            {
+                //lassuljon egy ideig
+                interval = sickSpeed;
+            }
+            else
+            {
+                //ujrainditjuk, vagy elinditjuk a kigyo hosszanak megfeleloen
+                interval = 900 / snake.Length + 250;                
+            }
             pendulum = new DispatcherTimer(TimeSpan.FromMilliseconds(interval), DispatcherPriority.Normal,
-                        ItsTimeForDisplay, Application.Current.Dispatcher);
+                            ItsTimeForDisplay, Application.Current.Dispatcher);
         }
 
         private void Clockshock(object sender, EventArgs e)
@@ -139,6 +163,25 @@ namespace SnakeGame.Model
                 //Vege a jateknak
                 EndOfGame();
             }
+
+            //epp most evett meg egy rohadt almat
+            if (becomeSick)
+            {
+                sicknessTime = TimeSpan.FromSeconds(0);
+                isSicknessTimerOn = true;
+                StartPendulum();
+                becomeSick = false;
+            }
+
+            if ((isSicknessTimerOn && (sicknessTime += TimeSpan.FromSeconds(1)) > sickPeriod))
+            {
+                isSicknessTimerOn = false;
+                StartPendulum();
+            }
+
+            //Oregszik a kigyo masodpercenkent
+            SnakeAgingDisplay(agingPerSeconds);
+            View.NumberOfMealsTextBlock.Text = score.ToString();
 
             View.LabelPlaytime.Content = $"{playTime.Minutes:00}:{playTime.Seconds:00}";
         }
@@ -213,6 +256,11 @@ namespace SnakeGame.Model
                 return;
             }
 
+            if (score < 1)
+            {
+                EndOfGame();
+                return;
+            }
             //ellenorini, hogy ettunk -e? Kigyo feje vs etelek listaja                
             //megprobaljuk torolni az etelt az etelek kozul
             var foodToDelete = foods.Remove(snake.HeadPosition.RowPosition, snake.HeadPosition.ColumnPosition);
@@ -221,7 +269,7 @@ namespace SnakeGame.Model
             {
                 //ettunk: a kigyo feje el fogja tuntetni az etelt a gridrol
                 //igy csak adminisztralnunk kell
-                Scoring(foodToDelete);
+                ScoringAndPenalty(foodToDelete);
 
                 //egyek nojon a kigyo hossza
                 snake.Length++;
@@ -258,7 +306,7 @@ namespace SnakeGame.Model
             UpdateFoods();
         }
 
-        private void Scoring(FoodPosition foodToDelete)
+        private void ScoringAndPenalty(FoodPosition foodToDelete)
         {
             switch (foodToDelete.Maturity)
             {
@@ -273,10 +321,13 @@ namespace SnakeGame.Model
                     break;
                 case FoodAgeEnum.Rothing:
                     score -= 1000;
+                    becomeSick = true;
+                    //StartPendulum();
                     break;
                 default:
                     break;
             }
+            if (score > scoreToExtendFoodArea) GetEmptyArenaPositions(0, RowCount, 0, ColumnCount);
         }
 
         private void EndOfGame()
@@ -425,23 +476,34 @@ namespace SnakeGame.Model
             }
 
             //Normal jatekmenet: Le kell kezelni a billentyuleuteseket a kigyo iranyitasahoz
+            //Oregszik a kigyo iranyvaltoztatasonkent
             switch (e.Key)
             {
                 case Key.Left:
-                    snake.Heading = SnakeHeadingEnum.Left;
+                    snake.Heading = SnakeHeadingEnum.Left;                    
+                    SnakeAgingDisplay(agingPerChangeHeading);
                     break;
                 case Key.Up:
                     snake.Heading = SnakeHeadingEnum.Up;
+                    SnakeAgingDisplay(agingPerChangeHeading);                    
                     break;
                 case Key.Right:
                     snake.Heading = SnakeHeadingEnum.Right;
+                    SnakeAgingDisplay(agingPerChangeHeading);
                     break;
                 case Key.Down:
                     snake.Heading = SnakeHeadingEnum.Down;
+                    SnakeAgingDisplay(agingPerChangeHeading);
                     break;
             }
             //Console.WriteLine($"A lenyomott bill: {e.Key}"); //Ez nekem nem mukodott...
             Debug.WriteLine($"A lenyomott bill: {e.Key}");                                 
+        }
+
+        private void SnakeAgingDisplay(int points)
+        {
+            score -= points;
+            View.NumberOfMealsTextBlock.Text = score.ToString();
         }
 
         private void StartNewGame()
@@ -486,7 +548,7 @@ namespace SnakeGame.Model
                 var occupiedArenaPoitions = snakeArenaPosition.Select(x => new { x.RowPosition, x.ColumnPosition })
                                 .Union(foods.FoodPositions.Select(x => new { x.RowPosition, x.ColumnPosition }));
 
-                var freeArenaPositions = EmptyTableArenapositions.Select(x => new { x.RowPosition, x.ColumnPosition })
+                var freeArenaPositions = emptyArenaPositions.Select(x => new { x.RowPosition, x.ColumnPosition })
                                 .Except(occupiedArenaPoitions.Select(x => new { x.RowPosition, x.ColumnPosition }));
 
                 int aFreeArenaPositionIndex = Random.Next(0, freeArenaPositions.Count() - 1);
