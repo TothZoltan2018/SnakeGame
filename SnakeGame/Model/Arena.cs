@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -32,7 +33,8 @@ namespace SnakeGame.Model
         private Foods foods;
         //A megevett etelek utan jaro pontok
         private int score;
-
+        //Ide szabad tenni uj etelet (vagy barmi mast)
+        private List<ArenaPosition> EmptyTableArenapositions;
         public Arena(MainWindow view)
         {
             this.View = view;
@@ -43,6 +45,26 @@ namespace SnakeGame.Model
             rndFood = new Random();            
         }
 
+        /// <summary>
+        /// Egy ArenaPosition tpusu lisat hoz letre, amiben a teljes tabla benne van. Ebbol fogjuk majd levonni a mar foglalt 
+        /// poyiciokat, ha uj etelet (vagy barmi mast) akarunk megjeleniteni.
+        /// </summary>
+        /// <returns></returns>
+        List<ArenaPosition> GetEmptyTablePositions()
+        {
+            List<ArenaPosition> emptyArenaPositions = new List<ArenaPosition>();
+            
+            for (int rowPosition = 0; rowPosition < RowCount; rowPosition++)
+            {
+                for (int columnPosition = 0; columnPosition < ColumnCount; columnPosition++)
+                {            
+                    emptyArenaPositions.Add(new ArenaPosition(rowPosition, columnPosition));
+                }
+            }
+
+            return emptyArenaPositions;
+        }
+
         private void InitializeGame()
         {
             foods = new Foods();
@@ -50,6 +72,8 @@ namespace SnakeGame.Model
             RowCount = View.ArenaGrid.RowDefinitions.Count;
             ColumnCount = View.ArenaGrid.ColumnDefinitions.Count;
 
+            EmptyTableArenapositions = GetEmptyTablePositions();
+                        
             //Ha ujrajatszas van, akkor torolni kell a tablat, pl. ures elemekkel a Grid eseteben
             if (isGameOver)
             {
@@ -80,6 +104,7 @@ namespace SnakeGame.Model
             pendulumClock.Stop();
                        
             score = 0;
+
             //megjelenitjuk, hogy mennyit ettunk            
             View.NumberOfMealsTextBlock.Text = score.ToString();
         }
@@ -429,35 +454,37 @@ namespace SnakeGame.Model
             GetNewFood(1);
 
         }
+
         /// <summary>
-        /// A fgv feladata, hogy generaljon egy uj etelt, olyat, ami nem a kigyo fejenek vagy farkanak helyen van,
-        /// es jelenitse is meg.
+        /// A fgv feladata, hogy generaljon uj eteleket (max foodNum darabot - veletlenszeruen), amik nem a kigyo fejenek, farkanak 
+        /// Todo: meglevo kajanak, vagy kakinak helyen vannak
         /// </summary>
+        /// <param name="foodNum"></param>
         private void GetNewFood(int foodNum)
-        {
-            //A kigyora nem rakhatjuk, ezert addig generalunk uj etelt, amig vegul nem esik ra
+        {            
             int row;
             int col;
 
             //var limterOfNewFoods = rndFood.Next(0, 2);
-            foodNum = rndFood.Next(1, foodNum + 1);            
+            foodNum = rndFood.Next(1, foodNum + 1);
+
+            List<ArenaPosition> snakeArenaPosition = new List<ArenaPosition>(snake.Tail);
+            snakeArenaPosition.Add(snake.HeadPosition);
 
             for (int i = 0; i < foodNum; i++)
             {
-                do
-                {
-                    //Etel kiosztasa
-                    //Veletlenszeruen
-                    row = Random.Next(0, RowCount - 1);
-                    col = Random.Next(0, ColumnCount - 1);
+                //Mivel a kigyo es a kaja nem tud (legalabbis ez a szandek) azonos poziciot kapni, ezert nem kellene a Select-tel biztositani azt, hogy
+                //a Union valoban egyszer szerepeltesse az eredmenyben a ket halmaz elemeit...
+                var occupiedArenaPoitions = snakeArenaPosition.Select(x => new { x.RowPosition, x.ColumnPosition })
+                                .Union(foods.FoodPositions.Select(x => new { x.RowPosition, x.ColumnPosition }));
 
-                } while (snake.HeadPosition.RowPosition == row && snake.HeadPosition.ColumnPosition == col
-                                        || foods.FoodPositions.Any(x => x.RowPosition == row && x.ColumnPosition == col)
-                                        || snake.Tail.Any(x => x.RowPosition == row && x.ColumnPosition == col));
-                                        //|| snake.Tail.Any(x => x == new ArenaPosition(row, col))) );
+                var freeArenaPositions = EmptyTableArenapositions.Select(x => new { x.RowPosition, x.ColumnPosition })
+                                .Except(occupiedArenaPoitions.Select(x => new { x.RowPosition, x.ColumnPosition }));
 
-                //adminisztraljuk az adatokat
-
+                int aFreeArenaPositionIndex = Random.Next(0, freeArenaPositions.Count() - 1);
+                row = freeArenaPositions.ToArray()[aFreeArenaPositionIndex].RowPosition; //.[aFreeArenaPositionIndex].RowPosition;
+                col = freeArenaPositions.ToArray()[aFreeArenaPositionIndex].ColumnPosition;
+ 
                 //megjelenitjuk az uj etelt
                 ShowFood(row, col);
                 //ezzel is jo,
