@@ -22,7 +22,15 @@ namespace SnakeGame.Model
         private DispatcherTimer pendulum, pendulumClock;
         private bool isStarted;
         private bool isGameOver;
-        public TimeSpan startPlayTime => TimeSpan.FromSeconds(130); //csak olvashato property
+        //public TimeSpan startPlayTime => TimeSpan.FromSeconds(130); //csak olvashato property
+
+        //Az app.config.xml-bol konfigolhato 
+        private TimeSpan startPlayTime = Properties.Settings.Default.Playtime;
+        private int foodUnmaturedTime = Properties.Settings.Default.FoodUnmaturedTime;
+        private int foodMaturedTime = Properties.Settings.Default.FoodMaturedTime;
+        private int foodWellmaturedTime = Properties.Settings.Default.FoodWellMaturedTime;
+        private int foodRothingTime = Properties.Settings.Default.FoodRothingTime;
+
         private TimeSpan playTime;
         //A tabla meretei
         private int RowCount;
@@ -93,7 +101,7 @@ namespace SnakeGame.Model
             View.GamePlayTextBlock.Visibility = System.Windows.Visibility.Visible;
             View.GamePlayBorder.Visibility = System.Windows.Visibility.Visible;
 
-            snake = new Snake(10, 10);
+            snake = new Snake(RowCount/2, ColumnCount/2);
 
             StartPendulum();
 
@@ -219,7 +227,7 @@ namespace SnakeGame.Model
                 snake.Length++;
 
                 //es gyorsuljon is
-
+                StartPendulum();
                 //megjelenitjuk, hogy mennyit ettunk                
                 View.NumberOfMealsTextBlock.Text = score.ToString();
 
@@ -316,19 +324,19 @@ namespace SnakeGame.Model
             for (int i = 0; i < foods.FoodPositions.Count; i++)
             {
                 var age = foods.FoodPositions[i].BornTime - playTime;
-                if (age.Seconds < 10)
+                if (age.Seconds < foodUnmaturedTime)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.UnMatured;                    
                 }
-                else if (age.Seconds < 27)
+                else if (age.Seconds < foodMaturedTime)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.Matured;
                 }
-                else if (age.Seconds < 32)
+                else if (age.Seconds < foodWellmaturedTime)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.WellMatured;
                 }
-                else if (age.Seconds < 50)
+                else if (age.Seconds < foodRothingTime)
                 {
                     foods.FoodPositions[i].Maturity = FoodAgeEnum.Rothing;
                 }
